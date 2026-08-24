@@ -1,0 +1,17 @@
+{
+  "name": "pomodoro-timer-local",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Offline single-file Pomodoro timer and work log",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "build": "node scripts/build-check.js",
+    "lint": "node scripts/lint-check.js",
+    "test:dev": "node scripts/run-node-tests.js tests/dev reports/dev.xml",
+    "test:review": "node scripts/run-node-tests.js tests/review reports/review.xml"
+  },
+  "devDependencies": {}
+}
