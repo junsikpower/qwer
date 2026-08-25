@@ -104,6 +104,7 @@
     }
 
     .nav-button {
+      position: relative;
       display: inline-flex;
       align-items: center;
       gap: 7px;
@@ -123,9 +124,22 @@
 
     .nav-button svg { width: 17px; height: 17px; }
 
+    .nav-badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 8px;
+      height: 8px;
+      background: var(--primary);
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px #fff;
+    }
+
+    .nav-badge[hidden] { display: none; }
+
     main { min-height: 650px; }
 
-    .view[hidden], .warning-banner[hidden], .memo-panel[hidden], .modal-backdrop[hidden] { display: none; }
+    .view[hidden], .warning-banner[hidden], .memo-panel[hidden], .modal-backdrop[hidden], .timer-controls[hidden] { display: none; }
 
     .view { animation: view-in 220ms ease both; }
 
@@ -461,6 +475,75 @@
     .log-entry span { min-width: 0; overflow: hidden; color: var(--ink); font-size: 0.87rem; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
     .empty-state { margin: 0; padding: 34px 12px; color: var(--muted); text-align: center; font-size: 0.88rem; }
 
+    .diary-layout {
+      display: grid;
+      grid-template-columns: minmax(260px, 0.85fr) minmax(0, 1.4fr);
+      align-items: start;
+      gap: 20px;
+    }
+
+    .diary-list-card { padding: 22px; }
+    .diary-list-card h2 { margin: 0 0 4px; font-size: 1.02rem; letter-spacing: -0.03em; }
+    .diary-list-card > p { margin: 0 0 16px; color: var(--muted); font-size: 0.83rem; }
+    .diary-new-button { width: 100%; justify-content: center; margin-bottom: 18px; }
+
+    .diary-entries { display: grid; gap: 8px; max-height: 560px; margin: 0; padding: 0; overflow-y: auto; list-style: none; }
+
+    .diary-entry-item {
+      width: 100%;
+      padding: 12px 13px;
+      color: var(--ink);
+      text-align: left;
+      background: #fafbfe;
+      border: 1px solid #f0f2f7;
+      border-radius: 12px;
+    }
+
+    .diary-entry-item:hover { background: #f5f6fb; }
+    .diary-entry-item.is-selected { background: var(--navy-soft); border-color: #dce3f5; }
+    .diary-entry-date { display: block; margin-bottom: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 700; }
+    .diary-entry-preview { display: block; overflow: hidden; font-size: 0.85rem; line-height: 1.4; text-overflow: ellipsis; white-space: nowrap; }
+
+    .diary-editor-card { display: flex; flex-direction: column; min-height: 560px; padding: 26px; }
+    .diary-editor-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+    .diary-editor-date { color: var(--muted); font-size: 0.83rem; font-weight: 700; }
+
+    .diary-unsaved-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 9px;
+      color: var(--warning);
+      background: var(--warning-soft);
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    .diary-unsaved-badge[hidden] { display: none; }
+
+    #diary-form { display: flex; flex: 1; flex-direction: column; min-height: 0; }
+    #diary-form[hidden] { display: none; }
+
+    #diary-body {
+      flex: 1;
+      min-height: 340px;
+      padding: 14px 16px;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      font: inherit;
+      line-height: 1.6;
+      resize: vertical;
+    }
+
+    .diary-editor-foot { display: flex; align-items: center; gap: 14px; margin-top: 14px; }
+    .diary-char-count { flex: 0 0 auto; color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .diary-editor-foot .form-error { flex: 1; }
+
+    .diary-empty-editor { margin: auto; color: var(--muted); font-size: 0.9rem; text-align: center; }
+    .diary-empty-editor[hidden] { display: none; }
+
     .modal-backdrop {
       position: fixed;
       z-index: 20;
@@ -505,6 +588,8 @@
       .timer-layout { grid-template-columns: 1fr; }
       .side-column { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .settings-grid { grid-template-columns: 1fr; }
+      .diary-layout { grid-template-columns: 1fr; }
+      .diary-entries { max-height: 320px; }
     }
 
     @media (max-width: 560px) {
@@ -547,10 +632,15 @@
         <button class="nav-button is-active" type="button" data-view="timer" aria-current="page">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v5l3.1 1.9"/><circle cx="12" cy="13" r="7.5"/><path d="M9 3.5h6"/></svg>
           타이머
+          <span id="timer-nav-badge" class="nav-badge" aria-hidden="true" hidden></span>
         </button>
         <button class="nav-button" type="button" data-view="log">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h14v15H5zM8.5 8h7M8.5 12h7M8.5 16h4"/></svg>
           작업 로그
+        </button>
+        <button class="nav-button" type="button" data-view="diary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4.5h9.5L19 8v11.5H6z"/><path d="M15.5 4.5V8H19M9 12h6M9 15.5h6"/></svg>
+          일기
         </button>
         <button class="nav-button" type="button" data-view="settings">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8.7a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6Z"/><path d="m19.4 15 .1.1a1.5 1.5 0 0 1-2.1 2.1l-.1-.1a1.5 1.5 0 0 0-2.6 1v.2a1.5 1.5 0 0 1-3 0v-.2a1.5 1.5 0 0 0-2.6-1l-.1.1a1.5 1.5 0 1 1-2.1-2.1l.1-.1a1.5 1.5 0 0 0-1-2.6h-.2a1.5 1.5 0 0 1 0-3h.2a1.5 1.5 0 0 0 1-2.6l-.1-.1a1.5 1.5 0 1 1 2.1-2.1l.1.1a1.5 1.5 0 0 0 2.6-1v-.2a1.5 1.5 0 0 1 3 0v.2a1.5 1.5 0 0 0 2.6 1l.1-.1a1.5 1.5 0 1 1 2.1 2.1l-.1.1a1.5 1.5 0 0 0 1 2.6h.2a1.5 1.5 0 0 1 0 3h-.2a1.5 1.5 0 0 0-1 2.6Z"/></svg>
@@ -681,6 +771,43 @@
           </form>
         </section>
       </section>
+
+      <section id="diary-view" class="view" aria-labelledby="diary-heading" hidden>
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">Write freely</p>
+            <h1 id="diary-heading">일기</h1>
+            <p>원하는 시점에 자유롭게 하루를 기록하고 다시 열어볼 수 있습니다.</p>
+          </div>
+        </div>
+        <div class="diary-layout">
+          <section class="diary-list-card card" aria-label="일기 목록">
+            <button id="diary-new-button" class="button button-primary diary-new-button" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+              <span>새 일기</span>
+            </button>
+            <h2>모든 일기</h2>
+            <p>최신 날짜 순으로 정렬됩니다.</p>
+            <ul id="diary-entry-list" class="diary-entries"></ul>
+          </section>
+          <section class="diary-editor-card card" aria-label="일기 편집">
+            <div class="diary-editor-head">
+              <span id="diary-editor-date" class="diary-editor-date"></span>
+              <span id="diary-unsaved-badge" class="diary-unsaved-badge" hidden>저장되지 않음</span>
+            </div>
+            <p id="diary-empty-state" class="diary-empty-editor" hidden>왼쪽에서 일기를 선택하거나 '새 일기'로 새로 작성해 보세요.</p>
+            <form id="diary-form">
+              <label class="sr-only" for="diary-body">일기 본문</label>
+              <textarea id="diary-body" maxlength="5000" placeholder="오늘 있었던 일을 자유롭게 적어보세요"></textarea>
+              <div class="diary-editor-foot">
+                <span id="diary-char-count" class="diary-char-count">0 / 5000</span>
+                <span id="diary-error" class="form-error" aria-live="polite"></span>
+                <button class="button button-primary" type="submit">저장</button>
+              </div>
+            </form>
+          </section>
+        </div>
+      </section>
     </main>
 
     <footer class="footer">모든 데이터는 이 브라우저에만 저장됩니다 · 오프라인으로 동작합니다</footer>
@@ -715,11 +842,16 @@
       var STORAGE_KEYS = Object.freeze({
         settings: "pomodoro-timer.settings.v1",
         logs: "pomodoro-timer.logs.v1",
-        timer: "pomodoro-timer.timer.v1"
+        timer: "pomodoro-timer.timer.v1",
+        diary: "pomodoro-timer.diary.v1",
+        diaryDraft: "pomodoro-timer.diaryDraft.v1"
       });
       var CLOCK_SHIFT_THRESHOLD_MS = 5000;
       var SECOND_MS = 1000;
       var MINUTE_MS = 60 * SECOND_MS;
+      var DIARY_MAX_LENGTH = 5000;
+      var DIARY_PREVIEW_MAX_CHARS = 60;
+      var DIARY_DRAFT_DEBOUNCE_MS = 800;
 
       function isFiniteNumber(value) {
         return typeof value === "number" && isFinite(value);
@@ -856,12 +988,89 @@
         return logs;
       }
 
+      function createDiaryIdGenerator() {
+        var lastTimestamp = -1;
+        var counter = 0;
+        return function generateDiaryId() {
+          var now = Date.now();
+          if (now === lastTimestamp) {
+            counter += 1;
+          } else {
+            lastTimestamp = now;
+            counter = 0;
+          }
+          return now + "-" + counter;
+        };
+      }
+
+      function isValidDiaryBody(text) {
+        if (typeof text !== "string") return false;
+        var trimmed = text.trim();
+        return trimmed.length >= 1 && trimmed.length <= DIARY_MAX_LENGTH;
+      }
+
+      function truncateDiaryPreview(body, maxChars) {
+        var text = String(body == null ? "" : body).trim();
+        if (text.length <= maxChars) return text;
+        return text.slice(0, maxChars).replace(/\s+$/, "") + "…";
+      }
+
+      function sortDiaryEntries(entries) {
+        return entries.slice().sort(function (a, b) {
+          if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+          return b.createdAt - a.createdAt;
+        });
+      }
+
+      function normalizeDiaryEntries(raw) {
+        if (!Array.isArray(raw)) return [];
+        var seen = {};
+        var result = [];
+        raw.forEach(function (item) {
+          if (!item || typeof item !== "object") return;
+          var id = item.id;
+          var date = item.date;
+          var body = item.body;
+          var createdAt = item.createdAt;
+          var updatedAt = item.updatedAt;
+          if (typeof id !== "string" || !id || seen[id]) return;
+          if (typeof date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+          if (typeof body !== "string" || !body.trim()) return;
+          if (!isFiniteNumber(createdAt) || !isFiniteNumber(updatedAt)) return;
+          seen[id] = true;
+          result.push({
+            id: id,
+            date: date,
+            body: body.length > DIARY_MAX_LENGTH ? body.slice(0, DIARY_MAX_LENGTH) : body,
+            createdAt: createdAt,
+            updatedAt: updatedAt
+          });
+        });
+        return result;
+      }
+
+      function normalizeDiaryDraft(raw) {
+        if (!raw || typeof raw !== "object") return null;
+        if (typeof raw.body !== "string") return null;
+        if (raw.targetType !== "new" && raw.targetType !== "existing") return null;
+        if (raw.targetType === "existing" && (typeof raw.targetId !== "string" || !raw.targetId)) return null;
+        var body = raw.body.length > DIARY_MAX_LENGTH ? raw.body.slice(0, DIARY_MAX_LENGTH) : raw.body;
+        return {
+          body: body,
+          targetType: raw.targetType,
+          targetId: raw.targetType === "existing" ? raw.targetId : null
+        };
+      }
+
       var core = Object.freeze({
         SESSION_TYPES: SESSION_TYPES,
         SESSION_LABELS: SESSION_LABELS,
         DEFAULT_SETTINGS: DEFAULT_SETTINGS,
         STORAGE_KEYS: STORAGE_KEYS,
         CLOCK_SHIFT_THRESHOLD_MS: CLOCK_SHIFT_THRESHOLD_MS,
+        DIARY_MAX_LENGTH: DIARY_MAX_LENGTH,
+        DIARY_PREVIEW_MAX_CHARS: DIARY_PREVIEW_MAX_CHARS,
+        DIARY_DRAFT_DEBOUNCE_MS: DIARY_DRAFT_DEBOUNCE_MS,
         isValidDurationInput: isValidDurationInput,
         minutesToMilliseconds: minutesToMilliseconds,
         getDurationMilliseconds: getDurationMilliseconds,
@@ -873,7 +1082,13 @@
         normalizeLogs: normalizeLogs,
         nextSessionAfterFocus: nextSessionAfterFocus,
         nextSessionAfterBreak: nextSessionAfterBreak,
-        createDefaultTimer: createDefaultTimer
+        createDefaultTimer: createDefaultTimer,
+        createDiaryIdGenerator: createDiaryIdGenerator,
+        isValidDiaryBody: isValidDiaryBody,
+        truncateDiaryPreview: truncateDiaryPreview,
+        sortDiaryEntries: sortDiaryEntries,
+        normalizeDiaryEntries: normalizeDiaryEntries,
+        normalizeDiaryDraft: normalizeDiaryDraft
       });
       global.PomodoroTimerCore = core;
 
@@ -888,6 +1103,13 @@
         this.logDate = localDateKey(Date.now());
         this.storageWarning = false;
         this.clockAlert = false;
+        this.diaryEntries = [];
+        this.diaryDraft = null;
+        this.diaryEditor = { mode: "empty", entryId: null, body: "" };
+        this.diaryDirty = false;
+        this.diaryNeedsSync = false;
+        this.diaryDraftTimer = null;
+        this.diaryIdGenerator = createDiaryIdGenerator();
         this.audioContext = null;
         this.notificationRequested = false;
         this.titleAlertActive = false;
@@ -938,7 +1160,18 @@
           settingsFeedback: document.getElementById("settings-feedback"),
           clockModal: document.getElementById("clock-modal"),
           clockResumeButton: document.getElementById("clock-resume-button"),
-          navButtons: Array.prototype.slice.call(document.querySelectorAll("[data-view]"))
+          navButtons: Array.prototype.slice.call(document.querySelectorAll("[data-view]")),
+          timerNavBadge: document.getElementById("timer-nav-badge"),
+          diaryView: document.getElementById("diary-view"),
+          diaryNewButton: document.getElementById("diary-new-button"),
+          diaryEntryList: document.getElementById("diary-entry-list"),
+          diaryEditorDate: document.getElementById("diary-editor-date"),
+          diaryUnsavedBadge: document.getElementById("diary-unsaved-badge"),
+          diaryEmptyState: document.getElementById("diary-empty-state"),
+          diaryForm: document.getElementById("diary-form"),
+          diaryBody: document.getElementById("diary-body"),
+          diaryCharCount: document.getElementById("diary-char-count"),
+          diaryError: document.getElementById("diary-error")
         };
       };
 
@@ -961,6 +1194,27 @@
         this.logs = normalizeLogs(this.readJSON(STORAGE_KEYS.logs, null));
         var savedTimer = this.readJSON(STORAGE_KEYS.timer, null);
         this.timer = normalizeTimer(savedTimer, this.settings, now, perfNow);
+
+        this.diaryEntries = sortDiaryEntries(normalizeDiaryEntries(this.readJSON(STORAGE_KEYS.diary, null)));
+        var restoredDraft = normalizeDiaryDraft(this.readJSON(STORAGE_KEYS.diaryDraft, null));
+        if (restoredDraft) {
+          if (restoredDraft.targetType === "existing") {
+            var targetExists = this.diaryEntries.some(function (entry) { return entry.id === restoredDraft.targetId; });
+            if (!targetExists) restoredDraft = { body: restoredDraft.body, targetType: "new", targetId: null };
+          }
+          this.diaryDraft = restoredDraft;
+          this.diaryEditor = {
+            mode: restoredDraft.targetType === "existing" ? "editing" : "new",
+            entryId: restoredDraft.targetType === "existing" ? restoredDraft.targetId : null,
+            body: restoredDraft.body
+          };
+          this.diaryDirty = true;
+        } else {
+          this.diaryDraft = null;
+          this.diaryEditor = { mode: "empty", entryId: null, body: "" };
+          this.diaryDirty = false;
+        }
+        this.diaryNeedsSync = true;
 
         if (this.timer.status === "Running" && this.timer.endTimestamp <= now) {
           this.finishExpiredSession(true);
@@ -990,7 +1244,9 @@
         var values = [
           [STORAGE_KEYS.settings, this.settings],
           [STORAGE_KEYS.logs, this.logs],
-          [STORAGE_KEYS.timer, this.serializeTimer()]
+          [STORAGE_KEYS.timer, this.serializeTimer()],
+          [STORAGE_KEYS.diary, this.diaryEntries],
+          [STORAGE_KEYS.diaryDraft, this.diaryDraft]
         ];
         try {
           var storage = global.localStorage;
@@ -1325,10 +1581,175 @@
       };
 
       PomodoroApp.prototype.changeView = function (view) {
-        if (["timer", "log", "settings"].indexOf(view) === -1) return;
+        if (["timer", "log", "settings", "diary"].indexOf(view) === -1) return;
         this.view = view;
         this.clearTitleAlert();
         this.render();
+      };
+
+      PomodoroApp.prototype.cancelDiaryDraftTimer = function () {
+        if (this.diaryDraftTimer) {
+          global.clearTimeout(this.diaryDraftTimer);
+          this.diaryDraftTimer = null;
+        }
+      };
+
+      PomodoroApp.prototype.clearDiaryDraft = function () {
+        this.cancelDiaryDraftTimer();
+        this.diaryDraft = null;
+      };
+
+      PomodoroApp.prototype.selectDiaryEntry = function (id) {
+        var found = null;
+        this.diaryEntries.forEach(function (entry) { if (entry.id === id) found = entry; });
+        if (!found) return;
+        this.clearDiaryDraft();
+        this.diaryEditor = { mode: "editing", entryId: found.id, body: found.body };
+        this.diaryDirty = false;
+        this.diaryNeedsSync = true;
+        this.elements.diaryError.textContent = "";
+        this.persistAll();
+        this.render();
+      };
+
+      PomodoroApp.prototype.startNewDiaryEntry = function () {
+        this.clearDiaryDraft();
+        this.diaryEditor = { mode: "new", entryId: null, body: "" };
+        this.diaryDirty = false;
+        this.diaryNeedsSync = true;
+        this.elements.diaryError.textContent = "";
+        this.persistAll();
+        this.render();
+      };
+
+      PomodoroApp.prototype.handleDiaryBodyInput = function (value) {
+        if (this.diaryEditor.mode === "empty") return;
+        this.diaryEditor.body = typeof value === "string" ? value.slice(0, DIARY_MAX_LENGTH) : "";
+        this.diaryDirty = true;
+        this.elements.diaryError.textContent = "";
+        this.renderDiaryCharCount();
+        this.renderDiaryUnsavedBadge();
+        this.cancelDiaryDraftTimer();
+        var app = this;
+        this.diaryDraftTimer = global.setTimeout(function () { app.commitDiaryDraft(); }, DIARY_DRAFT_DEBOUNCE_MS);
+      };
+
+      PomodoroApp.prototype.commitDiaryDraft = function () {
+        this.diaryDraftTimer = null;
+        if (this.diaryEditor.mode === "empty") return;
+        this.diaryDraft = {
+          body: this.diaryEditor.body,
+          targetType: this.diaryEditor.mode === "editing" ? "existing" : "new",
+          targetId: this.diaryEditor.mode === "editing" ? this.diaryEditor.entryId : null
+        };
+        this.persistAll();
+      };
+
+      PomodoroApp.prototype.saveDiaryEntry = function () {
+        var trimmed = this.diaryEditor.body.trim();
+        if (!isValidDiaryBody(trimmed)) {
+          this.elements.diaryError.textContent = "본문을 입력해 주세요.";
+          return false;
+        }
+        var now = Date.now();
+        if (this.diaryEditor.mode === "editing") {
+          var targetId = this.diaryEditor.entryId;
+          var entry = null;
+          this.diaryEntries.forEach(function (item) { if (item.id === targetId) entry = item; });
+          if (!entry) return false;
+          entry.body = trimmed;
+          entry.updatedAt = now;
+          this.diaryEditor.body = trimmed;
+        } else {
+          var newEntry = {
+            id: this.diaryIdGenerator(),
+            date: localDateKey(now),
+            body: trimmed,
+            createdAt: now,
+            updatedAt: now
+          };
+          this.diaryEntries.push(newEntry);
+          this.diaryEditor = { mode: "editing", entryId: newEntry.id, body: newEntry.body };
+        }
+        this.diaryEntries = sortDiaryEntries(this.diaryEntries);
+        this.clearDiaryDraft();
+        this.diaryDirty = false;
+        this.diaryNeedsSync = true;
+        this.elements.diaryError.textContent = "";
+        this.persistAll();
+        this.render();
+        return true;
+      };
+
+      PomodoroApp.prototype.diaryEditorEntryDate = function () {
+        var targetId = this.diaryEditor.entryId;
+        var found = "";
+        this.diaryEntries.forEach(function (entry) { if (entry.id === targetId) found = entry.date; });
+        return found;
+      };
+
+      PomodoroApp.prototype.renderDiaryCharCount = function () {
+        if (!this.elements.diaryCharCount) return;
+        this.elements.diaryCharCount.textContent = this.diaryEditor.body.length + " / " + DIARY_MAX_LENGTH;
+      };
+
+      PomodoroApp.prototype.renderDiaryUnsavedBadge = function () {
+        if (!this.elements.diaryUnsavedBadge) return;
+        this.elements.diaryUnsavedBadge.hidden = !(this.diaryEditor.mode !== "empty" && this.diaryDirty);
+      };
+
+      PomodoroApp.prototype.renderDiaryList = function () {
+        var list = this.elements.diaryEntryList;
+        if (!list) return;
+        list.textContent = "";
+        if (!this.diaryEntries.length) {
+          var empty = global.document.createElement("li");
+          empty.className = "empty-state";
+          empty.textContent = "아직 작성된 일기가 없습니다.";
+          list.appendChild(empty);
+          return;
+        }
+        var app = this;
+        this.diaryEntries.forEach(function (entry) {
+          var item = global.document.createElement("li");
+          var button = global.document.createElement("button");
+          button.type = "button";
+          button.className = "diary-entry-item";
+          button.classList.toggle("is-selected", app.diaryEditor.mode === "editing" && app.diaryEditor.entryId === entry.id);
+          button.setAttribute("data-entry-id", entry.id);
+          var dateSpan = global.document.createElement("span");
+          dateSpan.className = "diary-entry-date";
+          dateSpan.textContent = entry.date;
+          var previewSpan = global.document.createElement("span");
+          previewSpan.className = "diary-entry-preview";
+          previewSpan.textContent = truncateDiaryPreview(entry.body, DIARY_PREVIEW_MAX_CHARS);
+          button.appendChild(dateSpan);
+          button.appendChild(previewSpan);
+          item.appendChild(button);
+          list.appendChild(item);
+        });
+      };
+
+      PomodoroApp.prototype.renderDiaryEditor = function () {
+        var mode = this.diaryEditor.mode;
+        if (this.elements.diaryEmptyState) this.elements.diaryEmptyState.hidden = mode !== "empty";
+        if (this.elements.diaryForm) this.elements.diaryForm.hidden = mode === "empty";
+        if (this.elements.diaryEditorDate) {
+          this.elements.diaryEditorDate.textContent = mode === "editing"
+            ? this.diaryEditorEntryDate()
+            : mode === "new" ? "저장하면 오늘 날짜로 기록됩니다" : "";
+        }
+        if (this.diaryNeedsSync && this.elements.diaryBody) {
+          this.elements.diaryBody.value = this.diaryEditor.body;
+          this.diaryNeedsSync = false;
+        }
+        this.renderDiaryCharCount();
+        this.renderDiaryUnsavedBadge();
+      };
+
+      PomodoroApp.prototype.renderDiary = function () {
+        this.renderDiaryList();
+        this.renderDiaryEditor();
       };
 
       PomodoroApp.prototype.renderTimerOnly = function () {
@@ -1376,6 +1797,8 @@
         this.elements.timerView.hidden = this.view !== "timer";
         this.elements.logView.hidden = this.view !== "log";
         this.elements.settingsView.hidden = this.view !== "settings";
+        this.elements.diaryView.hidden = this.view !== "diary";
+        if (this.elements.timerNavBadge) this.elements.timerNavBadge.hidden = !this.timer.memoPending;
         this.elements.navButtons.forEach(function (button) {
           var active = button.getAttribute("data-view") === this.view;
           if (button.tagName === "BUTTON") {
@@ -1414,6 +1837,7 @@
         this.elements.clockModal.hidden = !this.clockAlert;
         this.renderLog();
         this.renderSettings();
+        this.renderDiary();
       };
 
       PomodoroApp.prototype.bindEvents = function () {
@@ -1447,9 +1871,25 @@
           app.clearTitleAlert();
           app.startTimer(false);
         });
+        this.elements.diaryNewButton.addEventListener("click", function () { app.startNewDiaryEntry(); });
+        this.elements.diaryEntryList.addEventListener("click", function (event) {
+          var button = event.target.closest ? event.target.closest("[data-entry-id]") : null;
+          if (!button) return;
+          app.selectDiaryEntry(button.getAttribute("data-entry-id"));
+        });
+        this.elements.diaryForm.addEventListener("submit", function (event) {
+          event.preventDefault();
+          app.saveDiaryEntry();
+        });
+        this.elements.diaryBody.addEventListener("input", function () {
+          app.handleDiaryBodyInput(app.elements.diaryBody.value);
+        });
         global.document.addEventListener("visibilitychange", function () { app.handleVisibilityChange(); });
         global.document.addEventListener("pointerdown", function () { app.activateAudio(); }, { once: true });
-        global.addEventListener("beforeunload", function () { app.persistAll(); });
+        global.addEventListener("beforeunload", function () {
+          if (app.diaryDraftTimer) app.commitDiaryDraft();
+          app.persistAll();
+        });
       };
 
       PomodoroApp.prototype.init = function () {

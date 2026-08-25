@@ -73,18 +73,21 @@ function makeDocument() {
     "short-duration-label", "long-duration-label", "memo-panel", "memo-form", "memo-input",
     "memo-skip-button", "log-date", "log-count", "log-list", "settings-form", "focus-minutes",
     "short-break-minutes", "long-break-minutes", "focus-error", "short-break-error", "long-break-error",
-    "settings-feedback", "clock-modal", "clock-resume-button"
+    "settings-feedback", "clock-modal", "clock-resume-button", "timer-nav-badge", "diary-view",
+    "diary-new-button", "diary-entry-list", "diary-editor-date", "diary-unsaved-badge",
+    "diary-empty-state", "diary-form", "diary-body", "diary-char-count", "diary-error"
   ];
   const elements = new Map(ids.map((id) => [id, new FakeElement(id.endsWith("-button") ? "button" : "div")]));
   elements.get("memo-form").tagName = "FORM";
   elements.get("settings-form").tagName = "FORM";
+  elements.get("diary-form").tagName = "FORM";
   const progressDots = [1, 2, 3, 4].map(() => new FakeElement("span"));
   const sessionInfo = ["Focus", "ShortBreak", "LongBreak"].map((session) => {
     const element = new FakeElement("div");
     element.setAttribute("data-session-info", session);
     return element;
   });
-  const navButtons = ["timer", "log", "settings"].map((view) => {
+  const navButtons = ["timer", "log", "settings", "diary"].map((view) => {
     const element = new FakeElement("button");
     element.setAttribute("data-view", view);
     return element;
@@ -379,4 +382,153 @@ test("test doubles use the standard Node mock facility and leave no pending time
   const tracker = mock.fn(() => "ok");
   assert.equal(tracker(), "ok");
   assert.equal(tracker.mock.callCount(), 1);
+});
+
+test("diary list shows an empty state and a new entry requires non-empty trimmed body (FR-09, FR-10)", () => {
+  const { app, elements, core } = makeWindow();
+  assert.equal(elements.get("diary-entry-list").children.length, 1);
+  assert.equal(elements.get("diary-entry-list").children[0].className, "empty-state");
+
+  app.startNewDiaryEntry();
+  assert.equal(app.diaryEditor.mode, "new");
+
+  app.diaryEditor.body = "   ";
+  assert.equal(app.saveDiaryEntry(), false);
+  assert.match(elements.get("diary-error").textContent, /본문을 입력/);
+  assert.equal(app.diaryEntries.length, 0);
+
+  app.diaryEditor.body = "  오늘의 기록  ";
+  assert.equal(app.saveDiaryEntry(), true);
+  assert.equal(app.diaryEntries.length, 1);
+  const saved = app.diaryEntries[0];
+  assert.equal(saved.body, "오늘의 기록");
+  assert.equal(saved.date, core.localDateKey(Date.now()));
+  assert.equal(saved.createdAt, saved.updatedAt);
+  assert.equal(typeof saved.id, "string");
+  assert.equal(app.diaryEditor.mode, "editing");
+  assert.equal(app.diaryEditor.entryId, saved.id);
+  app.cancelDiaryDraftTimer();
+});
+
+test("editing an existing diary entry updates only body/updatedAt and keeps id/date/createdAt (FR-11, BR-05)", () => {
+  const { app } = makeWindow();
+  app.startNewDiaryEntry();
+  app.diaryEditor.body = "원본 내용";
+  app.saveDiaryEntry();
+  const original = Object.assign({}, app.diaryEntries[0]);
+
+  app.selectDiaryEntry(original.id);
+  assert.equal(app.diaryEditor.mode, "editing");
+  assert.equal(app.diaryEditor.body, "원본 내용");
+
+  app.diaryEditor.body = "  수정된 내용  ";
+  assert.equal(app.saveDiaryEntry(), true);
+  assert.equal(app.diaryEntries.length, 1);
+  const updated = app.diaryEntries[0];
+  assert.equal(updated.id, original.id);
+  assert.equal(updated.date, original.date);
+  assert.equal(updated.createdAt, original.createdAt);
+  assert.equal(updated.body, "수정된 내용");
+  app.cancelDiaryDraftTimer();
+});
+
+test("diary entries sort by date desc, then createdAt desc within the same date (BR-05)", () => {
+  const { core } = makeWindow();
+  const entries = [
+    { id: "a", date: "2026-08-20", body: "x", createdAt: 100, updatedAt: 100 },
+    { id: "b", date: "2026-08-22", body: "x", createdAt: 50, updatedAt: 50 },
+    { id: "c", date: "2026-08-22", body: "x", createdAt: 200, updatedAt: 200 }
+  ];
+  const sorted = core.sortDiaryEntries(entries);
+  assert.deepEqual(sorted.map((entry) => entry.id), ["c", "b", "a"]);
+});
+
+test("unsaved diary drafts autosave after input settles and restore on reload (FR-12)", () => {
+  const { app, storage, core } = makeWindow();
+  app.startNewDiaryEntry();
+  app.handleDiaryBodyInput("작성 중인 내용");
+  assert.notEqual(app.diaryDraftTimer, null);
+  app.commitDiaryDraft();
+  assert.equal(app.diaryDraftTimer, null);
+
+  const storedDraft = JSON.parse(storage.getItem(core.STORAGE_KEYS.diaryDraft));
+  assert.equal(storedDraft.body, "작성 중인 내용");
+  assert.equal(storedDraft.targetType, "new");
+
+  const seed = Object.fromEntries(storage.values);
+  const restored = makeWindow(seed);
+  assert.equal(restored.app.diaryEditor.mode, "new");
+  assert.equal(restored.app.diaryEditor.body, "작성 중인 내용");
+  assert.equal(restored.app.diaryDirty, true);
+  assert.equal(restored.elements.get("diary-body").value, "작성 중인 내용");
+  assert.equal(restored.elements.get("diary-unsaved-badge").hidden, false);
+  restored.app.cancelDiaryDraftTimer();
+});
+
+test("a draft targeting a deleted entry falls back to new-entry mode without losing its body (FR-12)", () => {
+  const seed = {
+    "pomodoro-timer.diary.v1": JSON.stringify([]),
+    "pomodoro-timer.diaryDraft.v1": JSON.stringify({ body: "편집중이던 글", targetType: "existing", targetId: "missing-1" })
+  };
+  const { app } = makeWindow(seed);
+  assert.equal(app.diaryEditor.mode, "new");
+  assert.equal(app.diaryEditor.entryId, null);
+  assert.equal(app.diaryEditor.body, "편집중이던 글");
+  assert.equal(app.diaryDraft.targetType, "new");
+  app.cancelDiaryDraftTimer();
+});
+
+test("invalid stored diary entries are skipped on restore without breaking the app (FR-09)", () => {
+  const seed = {
+    "pomodoro-timer.diary.v1": JSON.stringify([
+      { id: "ok-1", date: "2026-08-24", body: "유효한 일기", createdAt: 10, updatedAt: 10 },
+      { id: "", date: "2026-08-24", body: "no id", createdAt: 10, updatedAt: 10 },
+      { id: "bad-date", date: "2026/08/24", body: "wrong date format", createdAt: 10, updatedAt: 10 },
+      { id: "empty-body", date: "2026-08-24", body: "   ", createdAt: 10, updatedAt: 10 },
+      { id: "no-times", date: "2026-08-24", body: "missing timestamps" }
+    ])
+  };
+  const { app } = makeWindow(seed);
+  assert.equal(app.diaryEntries.length, 1);
+  assert.equal(app.diaryEntries[0].id, "ok-1");
+});
+
+test("diary body input is capped at 5000 characters without dropping earlier content (EC-06)", () => {
+  const { app, core } = makeWindow();
+  app.startNewDiaryEntry();
+  const longText = "a".repeat(core.DIARY_MAX_LENGTH + 10);
+  app.handleDiaryBodyInput(longText);
+  assert.equal(app.diaryEditor.body.length, core.DIARY_MAX_LENGTH);
+  assert.equal(app.diaryEditor.body, "a".repeat(core.DIARY_MAX_LENGTH));
+  app.cancelDiaryDraftTimer();
+});
+
+test("generated diary identifiers stay unique even within the same millisecond (BR-05, 12.3 exclusion)", () => {
+  const { core } = makeWindow();
+  const generate = core.createDiaryIdGenerator();
+  const ids = new Set([generate(), generate(), generate(), generate()]);
+  assert.equal(ids.size, 4);
+});
+
+test("diary text survives Focus completion processing and the timer nav badge appears (BR-06, FR-13, 13.2)", () => {
+  const { app, elements } = makeWindow();
+  app.startNewDiaryEntry();
+  elements.get("diary-body").value = "작성 중인 본문";
+  elements.get("diary-body").dispatchEvent({ type: "input" });
+  assert.equal(app.diaryEditor.body, "작성 중인 본문");
+
+  setRunning(app, 1);
+  app.timer.endTimestamp = Date.now() - 1;
+  app.tick();
+
+  assert.equal(app.timer.memoPending != null, true);
+  assert.equal(elements.get("timer-nav-badge").hidden, false);
+  assert.equal(app.diaryEditor.body, "작성 중인 본문");
+  assert.equal(elements.get("diary-body").value, "작성 중인 본문");
+
+  elements.get("memo-skip-button").dispatchEvent({ type: "click" });
+  assert.equal(app.timer.memoPending, null);
+  assert.equal(elements.get("timer-nav-badge").hidden, true);
+  assert.equal(app.diaryEditor.body, "작성 중인 본문");
+  app.cancelDiaryDraftTimer();
 });
