@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+	<testcase name="REV-STRUCT-01 [3.2, 12.1, NFR-02, NFR-03] single-file offline constraints are observable" time="0.002475" classname="test"/>
+	<testcase name="REV-FR01-01 [FR-01] user controls follow Idle → Running → Paused → Idle and absolute time advances" time="0.003463" classname="test"/>
+	<testcase name="REV-FR01-02 [FR-01, BR-03] reset does not consume an already completed Focus slot" time="0.002584" classname="test"/>
+	<testcase name="REV-FR02-01 [FR-02, EC-01] granted notification permission triggers sound and browser notification together" time="0.001193" classname="test"/>
+	<testcase name="REV-FR02-02 [FR-02, EC-01] unsupported notification and failed audio use the title fallback" time="0.001095" classname="test"/>
+	<testcase name="REV-FR03-01 [FR-03, FR-05, BR-04] Focus completion records before memo resolution and starts Short Break after submission" time="0.012918" classname="test"/>
+	<testcase name="REV-FR03-02 [FR-03, BR-01] Break expiry starts Focus without showing memo UI" time="0.001401" classname="test"/>
+	<testcase name="REV-FR03-03 [FR-03, BR-01] consuming the fourth Focus slot selects Long Break" time="0.002054" classname="test"/>
+	<testcase name="REV-FR04-01 [FR-04, BR-01] skipping Focus advances the slot without changing completion count or requesting memo" time="0.001250" classname="test"/>
+	<testcase name="REV-FR04-02 [FR-04, BR-01] two skipped Focus slots plus two timed completions reach Long Break with count two" time="0.002165" classname="test"/>
+	<testcase name="REV-FR05-01 [FR-05] blank submission is accepted and displayed as no memo" time="0.001524" classname="test"/>
+	<testcase name="REV-FR06-01 [FR-06] selected day shows the saved count and chronological memo order" time="0.003063" classname="test"/>
+	<testcase name="REV-FR07-01 [FR-07] invalid duration inputs are rejected and Idle settings update immediately" time="0.001295" classname="test"/>
+	<testcase name="REV-FR07-02 [FR-07] Running and Paused sessions retain their current timing while settings change" time="0.002035" classname="test"/>
+	<testcase name="REV-FR08-01 [FR-08, EC-03, 13.2] Running state restores with its absolute end time after reload" time="0.001635" classname="test"/>
+	<testcase name="REV-FR08-02 [FR-08, EC-03, 13.2] Paused state restores the same positive snapshot after offline time" time="0.001784" classname="test"/>
+	<testcase name="REV-EC03-01 [EC-03, BR-02] an expired restored Focus is completed once and waits for memo interaction" time="0.001613" classname="test"/>
+	<testcase name="REV-EC02-01 [EC-02] a hidden tab defers expiry until visibilitychange and then reconciles by target time" time="0.000986" classname="test"/>
+	<testcase name="REV-EC04-01 [EC-04, NFR-01, 13.3-U4] a five-second-or-greater wall/performance delta pauses at the last valid display and offers resume" time="0.001087" classname="test"/>
+	<testcase name="REV-EC05-01 [EC-05, 13.3-U5] write failure keeps timer usable and a later successful write clears the warning" time="0.002992" classname="test"/>
+	<testcase name="REV-NFR01-01 [NFR-01, 13.3-U3] a long elapsed interval is derived from wall time without countdown drift" time="0.000876" classname="test"/>
+	<testcase name="REV-13.2-01 [13.2 System Acceptance] one foreground flow connects start, expiry, memo, break, next Focus, and log" time="0.001301" classname="test"/>
+	<testcase name="REV-13.3-U1 [13.3 User Acceptance] a timed user session produces the matching daily log including a blank memo" time="0.001069" classname="test"/>
+	<testcase name="REV-13.3-U2 [13.3 User Acceptance] settings, running timer, and log data survive a reload boundary" time="0.001543" classname="test"/>
+	<!-- tests 24 -->
+	<!-- suites 0 -->
+	<!-- pass 24 -->
+	<!-- fail 0 -->
+	<!-- cancelled 0 -->
+	<!-- skipped 0 -->
+	<!-- todo 0 -->
+	<!-- duration_ms 116.613896 -->
+</testsuites>

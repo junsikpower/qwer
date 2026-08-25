@@ -1,0 +1,14 @@
+2026-08-24T19:54:31.6780000Z Job is waiting for a hosted runner to come online.
+2026-08-24T19:54:31.6780000Z Job is about to start running on the hosted runner: GitHub Actions 1000000057
+2026-08-24T19:54:31.6730000Z Requested labels: ubuntu-latest
+2026-08-24T19:54:31.6730000Z Job defined at: junsikpower/ci-templates/.github/workflows/verify.yml@refs/tags/v3
+2026-08-24T19:54:31.6730000Z Reusable workflow chain:
+2026-08-24T19:54:31.6730000Z junsikpower/qwer/.github/workflows/ci.yml@refs/heads/main (0e8474d2bd689f26b3d492b9cbaa8f640a5db501)
+2026-08-24T19:54:31.6730000Z -> junsikpower/ci-templates/.github/workflows/verify.yml@refs/tags/v3 (b04fb0cd00332ef35629998634db0ab83ddbf758)
+2026-08-24T19:54:31.6730000Z Waiting for a runner to pick up this job...
+2026-08-24T19:54:31.6690000Z Evaluating verify.if
+2026-08-24T19:54:31.6690000Z Evaluating: success()
+2026-08-24T19:54:31.6690000Z Result: true
+2026-08-24T19:54:31.6690000Z Evaluating verify.verdict.if
+2026-08-24T19:54:31.6690000Z Evaluating: always()
+2026-08-24T19:54:31.6690000Z Result: true

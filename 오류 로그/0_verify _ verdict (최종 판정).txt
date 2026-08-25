@@ -1,0 +1,61 @@
+﻿2026-08-24T19:54:34.0884017Z Current runner version: '2.336.0'
+2026-08-24T19:54:34.0920444Z ##[group]Runner Image Provisioner
+2026-08-24T19:54:34.0921713Z Hosted Compute Agent
+2026-08-24T19:54:34.0922725Z Version: 20260729.566
+2026-08-24T19:54:34.0923689Z Commit: cf7153fe6e25b664e8693c24944bf2b00355d109
+2026-08-24T19:54:34.0925252Z Build Date: 2026-07-29T19:17:02Z
+2026-08-24T19:54:34.0926322Z Worker ID: {d7004fa8-58d5-4950-9f79-de85bc160728}
+2026-08-24T19:54:34.0927480Z Azure Region: northcentralus
+2026-08-24T19:54:34.0928690Z ##[endgroup]
+2026-08-24T19:54:34.0930830Z ##[group]Operating System
+2026-08-24T19:54:34.0931924Z Ubuntu
+2026-08-24T19:54:34.0932726Z 24.04.4
+2026-08-24T19:54:34.0933486Z LTS
+2026-08-24T19:54:34.0934782Z ##[endgroup]
+2026-08-24T19:54:34.0935645Z ##[group]Runner Image
+2026-08-24T19:54:34.0936991Z Image: ubuntu-24.04
+2026-08-24T19:54:34.0937900Z Version: 20260816.277.1
+2026-08-24T19:54:34.0939900Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260816.277/images/ubuntu/Ubuntu2404-Readme.md
+2026-08-24T19:54:34.0942406Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260816.277
+2026-08-24T19:54:34.0944047Z ##[endgroup]
+2026-08-24T19:54:34.0946285Z ##[group]GITHUB_TOKEN Permissions
+2026-08-24T19:54:34.0949996Z Contents: read
+2026-08-24T19:54:34.0950972Z Metadata: read
+2026-08-24T19:54:34.0951962Z PullRequests: read
+2026-08-24T19:54:34.0952890Z ##[endgroup]
+2026-08-24T19:54:34.0957261Z Secret source: Actions
+2026-08-24T19:54:34.0959364Z Prepare workflow directory
+2026-08-24T19:54:34.1429621Z Prepare all required actions
+2026-08-24T19:54:34.1581520Z Uses: junsikpower/ci-templates/.github/workflows/verify.yml@refs/tags/v3 (b04fb0cd00332ef35629998634db0ab83ddbf758)
+2026-08-24T19:54:34.1589586Z ##[group] Inputs
+2026-08-24T19:54:34.1591287Z   fail_on_skipped: false
+2026-08-24T19:54:34.1592274Z ##[endgroup]
+2026-08-24T19:54:34.1593163Z Complete job name: verify / verdict (최종 판정)
+2026-08-24T19:54:34.2749760Z ##[group]Run {
+2026-08-24T19:54:34.2750873Z [36;1m{[0m
+2026-08-24T19:54:34.2751731Z [36;1m  echo "## 검증 결과"[0m
+2026-08-24T19:54:34.2752794Z [36;1m  echo ""[0m
+2026-08-24T19:54:34.2753764Z [36;1m  echo "| 검사반 | 검사 코드 만든 쪽 | 결과 | 실행 | 건너뜀 |"[0m
+2026-08-24T19:54:34.2775544Z [36;1m  echo "|---|---|---|---|---|"[0m
+2026-08-24T19:54:34.2776819Z [36;1m  echo "| ci-fixed | 기본 검사 | success | - | - |"[0m
+2026-08-24T19:54:34.2778114Z [36;1m  echo "| dev-tests | 개발AI | failure | 0 | 0 |"[0m
+2026-08-24T19:54:34.2779505Z [36;1m  echo "| review-tests | 테스트AI | failure | 0 | 0 |"[0m
+2026-08-24T19:54:34.2780669Z [36;1m  echo ""[0m
+2026-08-24T19:54:34.2781734Z [36;1m  echo "※ '만든 쪽'은 누가 만든 검사가 깨졌는지일 뿐, 누구 잘못인지가 아님."[0m
+2026-08-24T19:54:34.2782977Z [36;1m  echo "※ '건너뜀'이 0이 아니면 그만큼 검사되지 않은 항목이 있다는 뜻임."[0m
+2026-08-24T19:54:34.2784142Z [36;1m} >> "$GITHUB_STEP_SUMMARY"[0m
+2026-08-24T19:54:34.3367789Z shell: /usr/bin/bash -e {0}
+2026-08-24T19:54:34.3369487Z ##[endgroup]
+2026-08-24T19:54:34.4362947Z ##[group]Run if [ "success" != "success" ] || \
+2026-08-24T19:54:34.4364119Z [36;1mif [ "success" != "success" ] || \[0m
+2026-08-24T19:54:34.4385653Z [36;1m   [ "failure" != "success" ] || \[0m
+2026-08-24T19:54:34.4386689Z [36;1m   [ "failure" != "success" ]; then[0m
+2026-08-24T19:54:34.4387628Z [36;1m  echo "VERDICT = false"[0m
+2026-08-24T19:54:34.4388454Z [36;1m  exit 1[0m
+2026-08-24T19:54:34.4389129Z [36;1mfi[0m
+2026-08-24T19:54:34.4389779Z [36;1mecho "VERDICT = true"[0m
+2026-08-24T19:54:34.4471423Z shell: /usr/bin/bash -e {0}
+2026-08-24T19:54:34.4472209Z ##[endgroup]
+2026-08-24T19:54:34.4589358Z VERDICT = false
+2026-08-24T19:54:34.4606058Z ##[error]Process completed with exit code 1.
+2026-08-24T19:54:34.4758921Z Cleaning up orphan processes

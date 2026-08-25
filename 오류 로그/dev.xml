@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+	<testcase name="core validates durations, formats time, and computes the approved clock-shift algorithm" time="0.003361" classname="test"/>
+	<testcase name="start, pause, and reset preserve accurate state and cycle slots" time="0.001140" classname="test"/>
+	<testcase name="a completed Focus increments the count, enters memo pending, then auto-starts Short Break" time="0.013609" classname="test"/>
+	<testcase name="memo skip stores an empty memo and the fourth Focus slot selects Long Break" time="0.001438" classname="test"/>
+	<testcase name="skipping Long Break resets the cycle and starts Focus" time="0.000919" classname="test"/>
+	<testcase name="settings apply immediately to Idle sessions but preserve active-session timing" time="0.001068" classname="test"/>
+	<testcase name="restoring an expired Running session processes exactly one session and waits Idle" time="0.000910" classname="test"/>
+	<testcase name="restoring a Paused session preserves its snapshot regardless of elapsed wall time" time="0.000771" classname="test"/>
+	<testcase name="clock-shift detection pauses without changing the last valid remaining snapshot" time="0.001053" classname="test"/>
+	<testcase name="storage write failures show a warning while timer actions continue" time="0.001263" classname="test"/>
+	<testcase name="allowed browser notification and synthesized sound are attempted together" time="0.000948" classname="test"/>
+	<testcase name="failed audio falls back to a changed tab title" time="0.000795" classname="test"/>
+	<testcase name="test doubles use the standard Node mock facility and leave no pending timer handles" time="0.000271" classname="test"/>
+	<!-- tests 13 -->
+	<!-- suites 0 -->
+	<!-- pass 13 -->
+	<!-- fail 0 -->
+	<!-- cancelled 0 -->
+	<!-- skipped 0 -->
+	<!-- todo 0 -->
+	<!-- duration_ms 94.402813 -->
+</testsuites>
